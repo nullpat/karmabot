@@ -21,7 +21,7 @@ PRIVATE_BOT_COMMANDS = dict(welcome=welcome_user)
 BOT_COMMANDS = dict(hello=hello_user,
                     karma=get_karma,
                     top_karma=top_karma)
-HELP_TEXT = '\n'.join([': {}'.format(name, func.__doc__)
+HELP_TEXT = '\n'.join(['{:<30}: {}'.format(name, func.__doc__)
                        for name, func in sorted(BOT_COMMANDS.items())])
 
 Message = namedtuple('Message', 'giverid channel text')
