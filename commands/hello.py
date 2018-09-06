@@ -1,9 +1,8 @@
-MSG = """Hey {user}, how are you doing today?
-Only answer if you already have coded some Python today ;)"""
+MSG = """Templar {user}, how are you doing today?"""
 
 
 def hello_user(**kwargs):
-    """A simple hello world message from karmabot"""
+    """Hello Templar"""
     user = kwargs.get('user')
     if not user:
         return None
