@@ -19,7 +19,7 @@ GENERAL_CHANNEL = 'CBAE51C82'
 
 PRIVATE_BOT_COMMANDS = dict(welcome=welcome_user)
 BOT_COMMANDS = dict(hello=hello_user,
-                    karma=get_karma,
+                    me=get_karma,
                     top=top_karma)
 HELP_TEXT = '\n'.join(['{:<30}: {}'.format(name, func.__doc__)
                        for name, func in sorted(BOT_COMMANDS.items())])
