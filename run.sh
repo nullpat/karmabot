@@ -1,4 +1,4 @@
-python=$(which python3)
+python=python
 cmd="$python main.py"
 until $cmd; do
     echo "Slack bot crashed with exit code $?. Respawning.." >&2

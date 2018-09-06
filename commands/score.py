@@ -17,9 +17,9 @@ def get_karma(**kwargs):
 
 
 def top_karma(**kwargs):
-    """Get the 5 PyBites members with most karma"""
-    output = ['Templars of the Eclipsed with most karma:']
-    for person, score in karmas.most_common(5):
+    """Ten Templars of the Eclipsed with most karma"""
+    output = ['Ten Templars of the Eclipsed with most karma:']
+    for person, score in karmas.most_common(10):
         output.append('{:<20} -> {}'.format(person, score))
     return '\n'.join(output)
 

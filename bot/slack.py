@@ -7,26 +7,20 @@ from slackclient import SlackClient
 from . import KARMA_BOT, SLACK_CLIENT, USERNAME_CACHE
 
 # bot commands
-from commands.add import add_command
-from commands.feed import get_pybites_last_entries
 from commands.hello import hello_user
 from commands.score import get_karma, top_karma
-from commands.topchannels import get_recommended_channels
 from commands.welcome import welcome_user
 
 GENERAL_CHANNEL = 'CBAE51C82'
-TEXT_FILTER_REPLIES = dict(fetchbeer=':beer:',
-                           cheers=':beers:',
-                           zen='`import this`',
-                           braces='braces?! `SyntaxError: not a chance`')
+#TEXT_FILTER_REPLIES = dict(fetchbeer=':beer:',
+#                           cheers=':beers:',
+#                           zen='`import this`',
+#                           braces='braces?! `SyntaxError: not a chance`')
 
 PRIVATE_BOT_COMMANDS = dict(welcome=welcome_user)
-BOT_COMMANDS = dict(add=add_command,
-                    feed=get_pybites_last_entries,
-                    hello=hello_user,
+BOT_COMMANDS = dict(hello=hello_user,
                     karma=get_karma,
-                    top_karma=top_karma,
-                    topchannels=get_recommended_channels)
+                    top_karma=top_karma)
 HELP_TEXT = '\n'.join(['{:<30}: {}'.format(name, func.__doc__)
                        for name, func in sorted(BOT_COMMANDS.items())])
 
