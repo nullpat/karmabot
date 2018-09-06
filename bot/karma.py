@@ -1,7 +1,7 @@
 from . import IS_USER, MAX_POINTS, karmas
 from .slack import lookup_username, post_msg
 
-KARMABOT = 'karmabot'
+KARMABOT = 'templar'
 
 
 def _parse_karma_change(karma_change):
@@ -12,7 +12,7 @@ def _parse_karma_change(karma_change):
     else:
         receiver = userid.strip(' #').lower()
 
-    points = voting.count('+') - voting.count('-')
+    points = voting.count('+', 0, 1) - voting.count('-', 0, 1)
 
     return receiver, points
 

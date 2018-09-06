@@ -14,7 +14,7 @@ from commands.score import get_karma, top_karma
 from commands.topchannels import get_recommended_channels
 from commands.welcome import welcome_user
 
-GENERAL_CHANNEL = 'C4SFQJJ9Z'
+GENERAL_CHANNEL = 'CBAE51C82'
 TEXT_FILTER_REPLIES = dict(fetchbeer=':beer:',
                            cheers=':beers:',
                            zen='`import this`',
@@ -69,7 +69,7 @@ def bot_joins_new_channel(msg):
                 channel=new_channel,
                 user=KARMA_BOT)
 
-    msg = 'Awesome, a new PyBites channel! Birds of a feather flock together!'
+    msg = 'Awesome, a new Templars of the Eclipsed channel! Birds of a feather flock together!'
     msg += ' Keep doing your nerdy stuff, I will keep track of your karmas :)'
 
     post_msg(new_channel, msg)
@@ -83,7 +83,7 @@ def perform_bot_cmd(msg):
     text = msg.get('text')
 
     # bot command needs to have bot fist in msg
-    if not text.strip('<>@').startswith((KARMA_BOT, 'karmabot')):
+    if not text.strip('<>@').startswith((KARMA_BOT, 'templar')):
         return None
 
     # need at least a command after karmabot

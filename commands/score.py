@@ -1,6 +1,6 @@
 from bot import karmas
 
-MSG = """Hey {user}, your current karma is {score}"""
+MSG = """Hey Templar {user} you have {score} karma. Deus Vult"""
 
 
 def get_karma(**kwargs):
@@ -18,7 +18,7 @@ def get_karma(**kwargs):
 
 def top_karma(**kwargs):
     """Get the 5 PyBites members with most karma"""
-    output = ['PyBites members with most karma:']
+    output = ['Templars of the Eclipsed with most karma:']
     for person, score in karmas.most_common(5):
         output.append('{:<20} -> {}'.format(person, score))
     return '\n'.join(output)
