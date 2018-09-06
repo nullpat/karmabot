@@ -52,13 +52,13 @@ class Karma:
     def _create_msg_bot_self_karma(self, points):
         receiver_karma = karmas.get(self.receiver, 0)
         if points > 0:
-            msg = 'Thanks @{} for the extra karma'.format(self.giver)
+            msg = 'Thanks Templar @{} for the extra karma'.format(self.giver)
             msg += ', my karma is {} now'.format(receiver_karma)
         else:
-            msg = 'Not cool @{} lowering my karma to {}'.format(self.giver,
+            msg = 'Cold of you Templar @{} lowering my karma to {}'.format(self.giver,
                                                                 receiver_karma)
-            msg += ', but you are probably right'
-            msg += ', I will work harder next time'
+            msg += ', however you are rightous and just'
+            msg += ', I will beg for His grace harder next time'
         return msg
 
     def _create_msg(self, points):
