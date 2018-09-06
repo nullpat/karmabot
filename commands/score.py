@@ -4,7 +4,7 @@ MSG = """Hey Templar {user} you have {score} karma. Deus Vult"""
 
 
 def get_karma(**kwargs):
-    """Lookup your current karma score"""
+    """Check your Templar's karma score"""
     user = kwargs.get('user')
     if not user:
         return 'User not found'

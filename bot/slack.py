@@ -20,7 +20,7 @@ GENERAL_CHANNEL = 'CBAE51C82'
 PRIVATE_BOT_COMMANDS = dict(welcome=welcome_user)
 BOT_COMMANDS = dict(hello=hello_user,
                     karma=get_karma,
-                    top_karma=top_karma)
+                    top=top_karma)
 HELP_TEXT = '\n'.join(['{:<30}: {}'.format(name, func.__doc__)
                        for name, func in sorted(BOT_COMMANDS.items())])
 
@@ -95,7 +95,7 @@ def perform_bot_cmd(msg):
         help_msg = ''
         if cmd != 'help':
             help_msg += '`raise ValueError` ... I am not that smart (yet), valid commands:\n\n'  # noqa E501
-        help_msg += '{:<30}: {}\n'.format('help', 'Print this help message')
+        help_msg += '{:<30}: {}\n'.format('help', 'Help for Templars that have lost their way')
         help_msg += HELP_TEXT
         return help_msg
 

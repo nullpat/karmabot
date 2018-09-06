@@ -2,7 +2,7 @@ MSG = """Templar {user}, how are you doing today?"""
 
 
 def hello_user(**kwargs):
-    """Hello Templar"""
+    """Hello world of Templars"""
     user = kwargs.get('user')
     if not user:
         return None
