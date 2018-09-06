@@ -126,13 +126,13 @@ def parse_next_msg():
     text = msg.get('text')
 
     # text replacements on first matching word in text
-    words = text and text.lower().split()
-    if words:
-        matching_words = [word.strip('?!') for word in words
-                          if word.strip('?!') in TEXT_FILTER_REPLIES]
-        if matching_words:
-            replacement_word = TEXT_FILTER_REPLIES.get(matching_words[0])
-            post_msg(channel, replacement_word)
+#    words = text and text.lower().split()
+#    if words:
+#        matching_words = [word.strip('?!') for word in words
+#                          if word.strip('?!') in TEXT_FILTER_REPLIES]
+#        if matching_words:
+#            replacement_word = TEXT_FILTER_REPLIES.get(matching_words[0])
+#            post_msg(channel, replacement_word)
 
     # if we recognize a valid bot command post its output, done
     cmd_output = text and perform_bot_cmd(msg)
