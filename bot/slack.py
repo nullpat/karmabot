@@ -9,9 +9,7 @@ from . import KARMA_BOT, SLACK_CLIENT, USERNAME_CACHE
 # bot commands
 from commands.help import create_commands_table
 from commands.score import get_karma, top_karma
-from commands.tip import get_random_tip
 from commands.welcome import welcome_user
-from commands.zen import import_this
 
 Message = namedtuple('Message', 'giverid channel text')
 
@@ -24,11 +22,9 @@ AUTOMATED_COMMANDS = dict(welcome=welcome_user)  # not manual
 ADMIN_BOT_COMMANDS = dict(top_karma=top_karma)
 PUBLIC_BOT_COMMANDS = dict(me=get_karma,
                            top=top_karma,
-                           help=create_commands_table,
-PRIVATE_BOT_COMMANDS = dict(feed=get_pybites_last_entries,  # takes up space
-                            help=create_commands_table,  # have everywhere
-                            karma=get_karma,
-                            )
+                           help=create_commands_table)
+PRIVATE_BOT_COMMANDS = dict(help=create_commands_table,  # have everywhere
+                            karma=get_karma)
 
 
 def create_help_msg(is_admin):
