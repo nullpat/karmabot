@@ -1,6 +1,7 @@
 from bot import karmas
 
 MSG = """Hey Templar {user} you have {score} karma. Deus Vult"""
+TOP_NUMBER = 10
 
 
 def get_karma(**kwargs):
@@ -11,7 +12,7 @@ def get_karma(**kwargs):
 
     score = karmas.get(user)
     if score is None:
-        return 'No karma score for Templar'
+        return "Sorry Templar, you don't have any karma yet"
 
     return MSG.format(user=user, score=score)
 
@@ -19,9 +20,10 @@ def get_karma(**kwargs):
 def top_karma(**kwargs):
     """Ten Templars of the Eclipsed with most karma"""
     output = ['Ten Templars of the Eclipsed with most karma:']
-    for person, score in karmas.most_common(10):
+    for person, score in karmas.most_common(TOP_NUMBER):
         output.append('{:<20} -> {}'.format(person, score))
-    return '\n'.join(output)
+    ret = '\n'.join(output)
+    return '```{}```'.format(ret)
 
 
 if __name__ == '__main__':

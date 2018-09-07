@@ -7,24 +7,40 @@ from slackclient import SlackClient
 from . import KARMA_BOT, SLACK_CLIENT, USERNAME_CACHE
 
 # bot commands
-from commands.hello import hello_user
+from commands.help import create_commands_table
 from commands.score import get_karma, top_karma
+from commands.tip import get_random_tip
 from commands.welcome import welcome_user
-
-GENERAL_CHANNEL = 'CBAE51C82'
-#TEXT_FILTER_REPLIES = dict(fetchbeer=':beer:',
-#                           cheers=':beers:',
-#                           zen='`import this`',
-#                           braces='braces?! `SyntaxError: not a chance`')
-
-PRIVATE_BOT_COMMANDS = dict(welcome=welcome_user)
-BOT_COMMANDS = dict(hello=hello_user,
-                    me=get_karma,
-                    top=top_karma)
-HELP_TEXT = '\n'.join(['{:<30}: {}'.format(name, func.__doc__)
-                       for name, func in sorted(BOT_COMMANDS.items())])
+from commands.zen import import_this
 
 Message = namedtuple('Message', 'giverid channel text')
+
+GENERAL_CHANNEL = 'CBAE51C82'
+ADMINS = ('U4RTDPKUH', 'U4TN52NG6', 'U4SJVFMEG')  # bob, julian, pybites
+TEXT_FILTER_REPLIES = dict(cheers=':beers:',
+                           braces='`SyntaxError: not a chance`')
+
+AUTOMATED_COMMANDS = dict(welcome=welcome_user)  # not manual
+ADMIN_BOT_COMMANDS = dict(top_karma=top_karma)
+PUBLIC_BOT_COMMANDS = dict(me=get_karma,
+                           top=top_karma,
+                           help=create_commands_table,
+PRIVATE_BOT_COMMANDS = dict(feed=get_pybites_last_entries,  # takes up space
+                            help=create_commands_table,  # have everywhere
+                            karma=get_karma,
+                            )
+
+
+def create_help_msg(is_admin):
+    help_msg = []
+    help_msg.append('\n1. Channel commands (format: `@karmabot command`)')
+    help_msg.append(create_commands_table(PUBLIC_BOT_COMMANDS))
+    help_msg.append('\n2. Message commands (DM `@karmabot` typing `command`)')
+    help_msg.append(create_commands_table(PRIVATE_BOT_COMMANDS))
+    if is_admin:
+        help_msg.append('\n3. Admin only commands')
+        help_msg.append(create_commands_table(ADMIN_BOT_COMMANDS))
+    return '\n'.join(help_msg)
 
 
 def lookup_username(userid):
@@ -37,11 +53,11 @@ def lookup_username(userid):
     return username
 
 
-def post_msg(channel, text):
-    logging.debug('posting to {}'.format(channel))
+def post_msg(channel_or_user, text):
+    logging.debug('posting to {}'.format(channel_or_user))
     logging.debug(text)
     SLACK_CLIENT.api_call("chat.postMessage",
-                          channel=channel,
+                          channel=channel_or_user,
                           text=text,
                           link_names=True,  # convert # and @ in links
                           as_user=True)
@@ -69,12 +85,9 @@ def bot_joins_new_channel(msg):
     post_msg(new_channel, msg)
 
 
-def perform_bot_cmd(msg):
-    """Parses message for valid bot command and returns output or None if
-       not a valid bot command request"""
-    user = msg.get('user')
-    channel = msg.get('channel')
-    text = msg.get('text')
+def _get_cmd(text, private=True):
+    if private:
+        return text.split()[0].strip().lower()
 
     # bot command needs to have bot fist in msg
     if not text.strip('<>@').startswith((KARMA_BOT, 'templar')):
@@ -85,70 +98,113 @@ def perform_bot_cmd(msg):
         return None
 
     # @karmabot blabla -> get blabla
-    cmd = text.split()[1].strip().lower()
+    cmd = text.split()[1]
 
     # of course ignore karma points
     if cmd.startswith(('+', '-')):
         return None
 
-    if cmd not in BOT_COMMANDS:
-        help_msg = ''
-        if cmd != 'help':
-            help_msg += '`raise ValueError` ... I am not that smart (yet), valid commands:\n\n'  # noqa E501
-        help_msg += '{:<30}: {}\n'.format('help', 'Help for Templars that have lost their way')
-        help_msg += HELP_TEXT
-        return help_msg
+    return cmd.strip().lower()
+
+
+def perform_bot_cmd(msg, private=True):
+    """Parses message and perform valid bot commands"""
+    user = msg.get('user')
+    userid = user and user.strip('<>@')
+    is_admin = userid and userid in ADMINS
+
+    channel = msg.get('channel')
+    text = msg.get('text')
+
+    command_set = private and PRIVATE_BOT_COMMANDS or PUBLIC_BOT_COMMANDS
+    cmd = text and _get_cmd(text, private=private)
+
+    if not cmd:
+        return None
+
+    if cmd == 'help':
+        return create_help_msg(is_admin)
+
+    command = command_set.get(cmd)
+    if private and is_admin and cmd in ADMIN_BOT_COMMANDS:
+        command = ADMIN_BOT_COMMANDS.get(cmd)
+
+    if not command:
+        return None
 
     kwargs = dict(user=lookup_username(user),
                   channel=channel,
                   text=text)
-    return BOT_COMMANDS[cmd](**kwargs)
+    return command(**kwargs)
+
+
+def perform_text_replacements(text):
+    """Replace first matching word in text with a little easter egg"""
+    words = text.lower().split()
+    strip_chars = '?!'
+    matching_words = [word.strip(strip_chars) for word in words
+                      if word.strip(strip_chars) in TEXT_FILTER_REPLIES]
+
+    if not matching_words:
+        return None
+
+    match_word = matching_words[0]
+    replace_word = TEXT_FILTER_REPLIES.get(match_word)
+    return 'To _{}_ I say: {}'.format(match_word, replace_word)
 
 
 def parse_next_msg():
+    """Parse next message posted on slack for actions todo by bot"""
     msg = SLACK_CLIENT.rtm_read()
     if not msg:
         return None
     msg = msg[0]
+    user = msg.get('user')
+    channel = msg.get('channel')
+    text = msg.get('text')
 
+    # not sure but sometimes we get dicts?
+    if (not isinstance(channel, str) or
+       not isinstance(user, str) or
+       not isinstance(text, str)):
+        return None
+
+    # handle events first
     type_event = msg.get('type')
+    # 1. if new channel auto-join bot
     if type_event == 'channel_created':
         bot_joins_new_channel(msg)
         return None
 
-    user = msg.get('user')
+    # 2. if a new user joins send a welcome msg
+    if type_event == 'team_join':
+        # return the message to apply the karma change
+        # https://api.slack.com/methods/users.info
+        welcome_msg = AUTOMATED_COMMANDS['welcome'](user)  # new user joining
+        post_msg(GENERAL_CHANNEL, welcome_msg)
+        # return Message object to handle karma in main
+        return Message(giverid=KARMA_BOT,
+                       channel=GENERAL_CHANNEL,
+                       text=welcome_msg)
+    # end events
 
     # ignore anything karma bot says!
     if user == KARMA_BOT:
         return None
 
-    channel = msg.get('channel')
-    text = msg.get('text')
-
     # text replacements on first matching word in text
-#    words = text and text.lower().split()
-#    if words:
-#        matching_words = [word.strip('?!') for word in words
-#                          if word.strip('?!') in TEXT_FILTER_REPLIES]
-#        if matching_words:
-#            replacement_word = TEXT_FILTER_REPLIES.get(matching_words[0])
-#            post_msg(channel, replacement_word)
+    # TODO: maybe this should replace all instances in text message ...
+    text_replace_output = text and perform_text_replacements(text)
+    if text_replace_output:
+        post_msg(channel, text_replace_output)
 
     # if we recognize a valid bot command post its output, done
-    cmd_output = text and perform_bot_cmd(msg)
+    # DM's = channels start with a 'D' / channel can be dict?!
+    private = channel and channel.startswith('D')
+    cmd_output = perform_bot_cmd(msg, private)
     if cmd_output:
         post_msg(channel, cmd_output)
         return None
-
-    # if a new user joins send a welcome msg
-    if type_event == 'team_join':
-        # return the message to apply the karma change
-        # https://api.slack.com/methods/users.info
-        channel = GENERAL_CHANNEL
-        msg = PRIVATE_BOT_COMMANDS['welcome'](user)  # new user joining
-        post_msg(channel, msg)
-        text = msg  # make sure to get to Message for karma
-        user = KARMA_BOT  # do this last for the karma giving
 
     if not channel or not text:
         return None
