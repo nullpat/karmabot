@@ -10,7 +10,7 @@ def _parse_karma_change(karma_change):
     if IS_USER.match(userid):
         receiver = lookup_username(userid)
     else:
-        receiver = userid.strip(' #').lower()
+        receiver = userid.strip(' #@').lower()
 
     points = voting.count('+') - voting.count('-')
 
