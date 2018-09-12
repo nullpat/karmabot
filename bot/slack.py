@@ -29,9 +29,9 @@ PRIVATE_BOT_COMMANDS = dict(help=create_commands_table,  # have everywhere
 
 def create_help_msg(is_admin):
     help_msg = []
-    help_msg.append('\n1. Channel commands (format: `@karmabot command`)')
+    help_msg.append('\nChannel commands (format: `@karmabot command`)')
     help_msg.append(create_commands_table(PUBLIC_BOT_COMMANDS))
-    help_msg.append('\n2. Message commands (DM `@karmabot` typing `command`)')
+    help_msg.append('\nMessage commands (DM `@karmabot` typing `command`)')
     help_msg.append(create_commands_table(PRIVATE_BOT_COMMANDS))
     if is_admin:
         help_msg.append('\n3. Admin only commands')
